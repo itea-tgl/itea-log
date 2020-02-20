@@ -1,9 +1,5 @@
 package ilog
 
-const (
-	DefaultFile = "itea.log"
-)
-
 type IOption interface {
 	do(ILog)
 }
@@ -17,7 +13,15 @@ func (o OptionFunc) do(l ILog)  {
 func EnableRotate() IOption {
 	return OptionFunc(func(l ILog) {
 		if f, ok := l.(*File); ok {
-			f.rotate = true
+			f.enableRotate()
+		}
+	})
+}
+
+func EnableDivide() IOption {
+	return OptionFunc(func(l ILog) {
+		if f, ok := l.(*File); ok {
+			f.enableDivide()
 		}
 	})
 }
@@ -25,7 +29,7 @@ func EnableRotate() IOption {
 func WithFile(file string) IOption {
 	return OptionFunc(func(l ILog) {
 		if f, ok := l.(*File); ok {
-			f.logfile = file
+			f.withFile(file)
 		}
 	})
 }

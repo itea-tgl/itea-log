@@ -9,6 +9,34 @@ import (
 	"time"
 )
 
+func Test_1(t *testing.T) {
+	Init(LogFile,
+		WithFile("aaaa.log"),
+		EnableDivide(),
+		EnableRotate(),
+	)
+
+	i := 0
+
+	for {
+		if i == 120 {
+			break
+		}
+		Info("a", "b", "c")
+		Error("1", "2", "3")
+		//Fatal("1", "1", "1")
+		//Debug(123)
+		time.Sleep(1 * time.Second)
+		i++
+	}
+
+	for {
+		if Done() {
+			break
+		}
+	}
+}
+
 func Test_ConsoleLog(t *testing.T) {
 	Init(nil)
 	Info("a", "b", "c")
@@ -57,7 +85,12 @@ func checkFile(t *testing.T, file string) {
 		return
 	}
 
-	defer os.Remove(file)
+	defer func() {
+		err = os.Remove(file)
+		if err != nil {
+			fmt.Println("file remove error : ", err)
+		}
+	}()
 
 	dat, err := ioutil.ReadFile(file)
 	if err != nil {
