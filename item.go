@@ -56,7 +56,6 @@ func rotateFile(i *item) {
 		return
 	}
 	go func() {
-		fmt.Println(1111111111111111111)
 		for {
 			now := time.Now()
 			// 计算下一个零点
