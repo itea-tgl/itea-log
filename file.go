@@ -1,24 +1,31 @@
 package ilog
 
 import (
+	"strings"
 	"sync"
 )
 
 const (
-	DefaultFile = "itea.log"
-	TypeInfo	= "INFO"
-	TypeError 	= "ERROR"
-	TypeDebug 	= "DEBUG"
-	TypeFatal 	= "FATAL"
+	DefaultFile  = "itea.log"
+	DefaultClean = 30
+	TypeInfo	 = "INFO"
+	TypeError 	 = "ERROR"
+	TypeDebug 	 = "DEBUG"
+	TypeFatal 	 = "FATAL"
 )
 
-var logLevel []string
+var (
+	logLevel	[]string
+	dir 		string
+	clean 		int
+)
 
 func init() {
 	logLevel = []string{
 		TypeInfo, TypeError,
 		//TypeDebug, TypeFatal,
 	}
+	dir = "./"
 }
 
 type option struct {
@@ -35,6 +42,8 @@ type File struct {
 
 func (f *File) Init() {
 	f.logs = make(map[string]*item)
+
+	getDir(f.option.logfile)
 
 	for _, l := range logLevel {
 		f.logs[l] = NewItem(l, *f.option)
@@ -89,11 +98,27 @@ func (f *File) enableDivide() {
 	f.option.divide = true
 }
 
-func (f *File) withFile(file string) {
-	f.option.logfile = file
+func (f *File) withFile(s string) {
+	if string(s[0]) == "/" {
+		s = s[1:]
+	}
+	f.option.logfile = s
+}
+
+func (f *File) fileKeep(n int) {
+	clean = n
+}
+
+func getDir(s string) {
+	a := strings.Split(s, "/")
+	if len(a) > 1 {
+		dir = dir + strings.Join(a[:len(a)-1], "/")
+	}
+	//log.Println(dir)
 }
 
 func LogFile() ILog {
+	clean = DefaultClean
 	return &File{option:&option{
 		logfile:DefaultFile,
 	}}

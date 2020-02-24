@@ -33,3 +33,11 @@ func WithFile(file string) IOption {
 		}
 	})
 }
+
+func FileKeep(d int) IOption {
+	return OptionFunc(func(l ILog) {
+		if f, ok := l.(*File); ok {
+			f.fileKeep(d)
+		}
+	})
+}

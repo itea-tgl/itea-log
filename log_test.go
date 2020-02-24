@@ -9,17 +9,19 @@ import (
 	"time"
 )
 
+
 func Test_1(t *testing.T) {
 	Init(LogFile,
-		WithFile("aaaa.log"),
+		WithFile("log/aaaa.log"),
 		EnableDivide(),
 		EnableRotate(),
+		FileKeep(1),
 	)
 
 	i := 0
 
 	for {
-		if i == 120 {
+		if i == 180 {
 			break
 		}
 		Info("a", "b", "c")
