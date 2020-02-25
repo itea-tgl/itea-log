@@ -112,9 +112,9 @@ func (f *File) fileKeep(n int) {
 func getDir(s string) {
 	a := strings.Split(s, "/")
 	if len(a) > 1 {
-		dir = dir + strings.Join(a[:len(a)-1], "/")
+		a[len(a)-1] = ""
+		dir = dir + strings.Join(a, "/")
 	}
-	//log.Println(dir)
 }
 
 func LogFile() ILog {

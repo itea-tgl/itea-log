@@ -102,15 +102,20 @@ func fileClean(n int) {
 			continue
 		} else {
 			//log.Println(fi.Name(), "-", fi.ModTime().Format("2006-01-02 15:04:05"), "-", time.Since(fi.ModTime()).Seconds()) //code for test
-			//if time.Since(fi.ModTime()).Seconds() >= (float64(n) * time.Minute.Seconds() - 1) { //code for test
-			if time.Since(fi.ModTime()).Seconds() >= (float64(n) * 24 * time.Hour.Seconds() - 1) {
-				err = os.Remove(fmt.Sprintf("%s/%s", dir, fi.Name()))
+			//if time.Since(fi.ModTime()).Seconds() >= (float64(n) * time.Minute.Seconds() - 1) && isLog(fi.Name()) { //code for test
+			if time.Since(fi.ModTime()).Seconds() >= (float64(n) * 24 * time.Hour.Seconds() - 1)  && isLog(fi.Name()) {
+				err = os.Remove(dir + fi.Name())
 				if err != nil {
 					log.Println("file remove error : ", err)
 				}
 			}
 		}
 	}
+}
+
+func isLog(f string) bool {
+	l := len(f)
+	return l > 4 && f[l-4:] == ".log"
 }
 
 func (i *item) formatFilename() string {

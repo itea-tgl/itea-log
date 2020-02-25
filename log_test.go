@@ -10,34 +10,34 @@ import (
 )
 
 
-func Test_1(t *testing.T) {
-	Init(LogFile,
-		WithFile("log/aaaa.log"),
-		EnableDivide(),
-		EnableRotate(),
-		FileKeep(1),
-	)
-
-	i := 0
-
-	for {
-		if i == 180 {
-			break
-		}
-		Info("a", "b", "c")
-		Error("1", "2", "3")
-		//Fatal("1", "1", "1")
-		//Debug(123)
-		time.Sleep(1 * time.Second)
-		i++
-	}
-
-	for {
-		if Done() {
-			break
-		}
-	}
-}
+//func Test_1(t *testing.T) {
+//	Init(LogFile,
+//		WithFile("aaaa.log"),
+//		EnableDivide(),
+//		EnableRotate(),
+//		FileKeep(1),
+//	)
+//
+//	i := 0
+//
+//	for {
+//		if i == 180 {
+//			break
+//		}
+//		Info("a", "b", "c")
+//		Error("1", "2", "3")
+//		//Fatal("1", "1", "1")
+//		//Debug(123)
+//		time.Sleep(1 * time.Second)
+//		i++
+//	}
+//
+//	for {
+//		if Done() {
+//			break
+//		}
+//	}
+//}
 
 func Test_ConsoleLog(t *testing.T) {
 	Init(nil)
