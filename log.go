@@ -13,6 +13,7 @@ type ILog interface {
 	Fatal(v ...interface{})
 }
 
+// ProcessorConstruct is the type for a function capable of constructing new ILog.
 type LogConstruct func() ILog
 
 func Init(l LogConstruct, opts ...IOption) {

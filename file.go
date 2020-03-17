@@ -16,7 +16,7 @@ const (
 
 var (
 	logLevel	[]string
-	dir 		string
+	directory 	string
 	clean 		int
 )
 
@@ -25,7 +25,7 @@ func init() {
 		TypeInfo, TypeError,
 		//TypeDebug, TypeFatal,
 	}
-	dir = "./"
+	directory = "./"
 }
 
 type option struct {
@@ -43,7 +43,7 @@ type File struct {
 func (f *File) Init() {
 	f.logs = make(map[string]*item)
 
-	getDir(f.option.logfile)
+	dir(f.option.logfile)
 
 	for _, l := range logLevel {
 		f.logs[l] = NewItem(l, *f.option)
@@ -109,12 +109,13 @@ func (f *File) fileKeep(n int) {
 	clean = n
 }
 
-func getDir(s string) {
+func dir(s string) {
 	a := strings.Split(s, "/")
-	if len(a) > 1 {
-		a[len(a)-1] = ""
-		dir = dir + strings.Join(a, "/")
+	if l := len(a); l > 1 {
+		a[l-1] = ""
+		directory = directory + strings.Join(a, "/")
 	}
+	//log.Fatalln(directory)
 }
 
 func LogFile() ILog {

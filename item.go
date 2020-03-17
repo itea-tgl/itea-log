@@ -13,10 +13,10 @@ import (
 var rotateItems []*item
 
 type item struct {
-	filename string
-	prefix string
-	log *log.Logger
-	file *os.File
+	filename 	string
+	prefix 		string
+	log 		*log.Logger
+	file 		*os.File
 }
 
 func NewItem(p string, o option) *item {
@@ -29,9 +29,9 @@ func NewItem(p string, o option) *item {
 		rotateFile(i)
 		o.logfile = i.rotateName()
 	}
-	file, err := os.OpenFile(o.logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND,0)
+	file, err := os.OpenFile(o.logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND,0666)
 	if err != nil {
-		panic("open log file error !")
+		log.Fatalln(err)
 	}
 	i.file = file
 	i.log = log.New(file, i.prefix, log.LstdFlags)
@@ -39,8 +39,7 @@ func NewItem(p string, o option) *item {
 }
 
 func (i *item) rotateName() string {
-	l := len(i.filename)
-	if i.filename[l-4:] == ".log" {
+	if l := len(i.filename); i.filename[l-4:] == ".log" {
 		i.filename = i.filename[:l-4]
 	}
 	var s bytes.Buffer
@@ -63,8 +62,8 @@ func rotateFile(i *item) {
 			// 计算下一个零点
 			//next := now.Add(time.Second * 60) //code for test
 			//next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 0, 0, next.Location()) //code for test
-			next := now.Add(time.Second * 60)
-			next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 0, 0, next.Location())
+			next := now.Add(time.Hour * 24)
+			next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
 			t := time.NewTimer(next.Sub(now))
 			<-t.C
 			for _, i := range rotateItems {
@@ -78,7 +77,7 @@ func rotateFile(i *item) {
 func fileRotate(i *item) {
 	name := i.rotateName()
 	for {
-		file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_APPEND,0)
+		file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_APPEND,0666)
 		if err == nil {
 			i.log = log.New(file, i.prefix, log.LstdFlags)
 			err = i.file.Close()
@@ -92,7 +91,7 @@ func fileRotate(i *item) {
 }
 
 func fileClean(n int) {
-	rd, err := ioutil.ReadDir(dir)
+	rd, err := ioutil.ReadDir(directory)
 	if err != nil {
 		log.Println("log dir scan error : ", err)
 		return
@@ -100,14 +99,13 @@ func fileClean(n int) {
 	for _, fi := range rd {
 		if fi.IsDir() {
 			continue
-		} else {
-			//log.Println(fi.Name(), "-", fi.ModTime().Format("2006-01-02 15:04:05"), "-", time.Since(fi.ModTime()).Seconds()) //code for test
-			//if time.Since(fi.ModTime()).Seconds() >= (float64(n) * time.Minute.Seconds() - 1) && isLog(fi.Name()) { //code for test
-			if time.Since(fi.ModTime()).Seconds() >= (float64(n) * 24 * time.Hour.Seconds() - 1)  && isLog(fi.Name()) {
-				err = os.Remove(dir + fi.Name())
-				if err != nil {
-					log.Println("file remove error : ", err)
-				}
+		}
+		//log.Println(fi.Name(), "-", fi.ModTime().Format("2006-01-02 15:04:05"), "-", time.Since(fi.ModTime()).Seconds()) //code for test
+		//if time.Since(fi.ModTime()).Seconds() >= (float64(n) * time.Minute.Seconds() - 1) && isLog(fi.Name()) { //code for test
+		if time.Since(fi.ModTime()).Seconds() >= (float64(n) * 24 * time.Hour.Seconds() - 1) && isLog(fi.Name()) {
+			err = os.Remove(directory + fi.Name())
+			if err != nil {
+				log.Println("file remove error : ", err)
 			}
 		}
 	}
@@ -120,13 +118,12 @@ func isLog(f string) bool {
 
 func (i *item) formatFilename() string {
 	arr := strings.Split(i.filename, "/")
-	l := len(arr)
-	if l <= 0 {
-		return ""
+	if l := len(arr); l > 0 {
+		arr[l-1] = strings.ToLower(i.prefix) + "-" + arr[l-1]
+		i.filename = strings.Join(arr, "/")
+		return i.filename
 	}
-	arr[l-1] = strings.ToLower(i.prefix) + "-" + arr[l-1]
-	i.filename = strings.Join(arr, "/")
-	return i.filename
+	return ""
 }
 
 func (i *item) logPrefix() {
@@ -140,6 +137,6 @@ func (i *item) print(v ...interface{}) {
 func (i *item) close() {
 	err := i.file.Close()
 	if err != nil {
-		log.Println(err)
+		log.Println("file close error : ", err)
 	}
 }

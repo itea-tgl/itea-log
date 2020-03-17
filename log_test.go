@@ -10,13 +10,13 @@ import (
 )
 
 
-//func Test_1(t *testing.T) {
-//	Init(LogFile,
-//		WithFile("aaaa.log"),
-//		EnableDivide(),
-//		EnableRotate(),
-//		FileKeep(1),
-//	)
+func Test_1(t *testing.T) {
+	Init(LogFile,
+		WithFile("/aaaa.log"),
+		EnableDivide(),
+		EnableRotate(),
+		FileKeep(1),
+	)
 //
 //	i := 0
 //
@@ -24,7 +24,8 @@ import (
 //		if i == 180 {
 //			break
 //		}
-//		Info("a", "b", "c")
+		Info("a", "b", "c")
+		Error("a", "b", "c")
 //		Error("1", "2", "3")
 //		//Fatal("1", "1", "1")
 //		//Debug(123)
@@ -32,12 +33,14 @@ import (
 //		i++
 //	}
 //
-//	for {
-//		if Done() {
-//			break
-//		}
-//	}
-//}
+	for {
+		if Done() {
+			break
+		}
+	}
+	checkFile(t, fmt.Sprintf("info-aaaa-%s.log", time.Now().Format("2006-01-02")))
+	checkFile(t, fmt.Sprintf("error-aaaa-%s.log", time.Now().Format("2006-01-02")))
+}
 
 func Test_ConsoleLog(t *testing.T) {
 	Init(nil)
@@ -101,7 +104,12 @@ func checkFile(t *testing.T, file string) {
 	}
 
 	now := time.Now().Format("2006/01/02 15:04:05")
-	expect := fmt.Sprintf("[INFO] %s %s", now, "a b c")
+	var expect string
+	if file[:5] == "error" {
+		expect = fmt.Sprintf("[ERROR] %s %s", now, "a b c")
+	} else {
+		expect = fmt.Sprintf("[INFO] %s %s", now, "a b c")
+	}
 
 	if strings.Trim(string(dat), "\r\n") != expect {
 		t.Errorf("log content error, expect %s, get %s", expect, string(dat))
